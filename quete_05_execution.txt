@@ -1,0 +1,64 @@
+=== 1. Construction de l'image API ===
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 454B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22.11-alpine
+#2 ...
+
+#3 [auth] library/node:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22.11-alpine
+#2 DONE 1.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 78B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 126B done
+#5 DONE 0.0s
+
+#6 [1/5] FROM docker.io/library/node:22.11-alpine@sha256:b64ced2e7cd0a4816699fe308ce6e8a08ccba463c757c00c14cd372e3d2c763e
+#6 resolve docker.io/library/node:22.11-alpine@sha256:b64ced2e7cd0a4816699fe308ce6e8a08ccba463c757c00c14cd372e3d2c763e 0.0s done
+#6 DONE 0.0s
+
+#7 [3/5] COPY --chown=node:node package.json package-lock.json ./
+#7 CACHED
+
+#8 [4/5] RUN npm ci --omit=dev
+#8 CACHED
+
+#9 [2/5] WORKDIR /app
+#9 CACHED
+
+#10 [5/5] COPY --chown=node:node server.js db.js ./
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 exporting manifest sha256:2d6f748e51ee0f90bb16fbbf4a2a1c81eee43dca12f72480f58bcce6320dcac0 done
+#11 exporting config sha256:8ab9b3faa7aec3c12b6cefb0bb4377eed6cc0262ba381ef9aa6b0890a2f3f120 done
+#11 exporting attestation manifest sha256:14aeeb71f90703a62a432e577d1ec5cb461de04b015420469fc0ef077612a177
+#11 exporting attestation manifest sha256:14aeeb71f90703a62a432e577d1ec5cb461de04b015420469fc0ef077612a177 0.0s done
+#11 exporting manifest list sha256:9bdef155854229aa54e8ce5f0e33d60e6529195efb0b20d1d4881eb6576a91ef 0.0s done
+#11 naming to docker.io/library/demo-api:1.0 done
+#11 unpacking to docker.io/library/demo-api:1.0 done
+#11 DONE 0.1s
+=== 2. Création du volume ===
+demo_pgdata
+=== 3. Création du réseau ===
+619c18205c674f7a59af658f5bae0ac0f690f183da4a70a067aa80e04efe361f
+=== 4. Démarrage de PostgreSQL ===
+2f881f15d4a6c1d3eb14fc50042035672dc5a25eeb93c79f0af7aa9950372150
+Attente de PostgreSQL...
+PostgreSQL est prêt.
+=== 5. Démarrage de l'API ===
+f326e7fcb49b3c8fa0e77250f30aa99da0bfe83f726a36657ab27a3ccf46f91d
+Attente de l'API...
+API disponible.
+=== 6. Ajout du produit ===
+curl: (22) The requested URL returned error: 503
