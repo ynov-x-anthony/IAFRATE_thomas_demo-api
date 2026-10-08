@@ -1,8 +1,4 @@
-
-#!/usr/bin/env bash
 set -euo pipefail
-
-# Quête 5 : persistance des données PostgreSQL
 
 VOLUME="demo_pgdata"
 NETWORK="demo_volumes_net"
@@ -123,5 +119,4 @@ docker volume ls --filter "name=^${VOLUME}$"
 
 echo "=== Fin du challenge ==="
 echo "Le volume $VOLUME est conservé."
-# Pour le supprimer plus tard, après vérification :
-# docker volume rm demo_pgdata
+
