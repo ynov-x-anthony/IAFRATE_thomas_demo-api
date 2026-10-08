@@ -1,3 +1,4 @@
+
 # syntax=docker/dockerfile:1
 
 # Étape 1 : installation des dépendances
@@ -7,17 +8,31 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci --omit=dev
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+    npm ci --omit=dev
 
-# Étape 2 : image finale
+# Étape 2 : image finale minimale, sans npm
 FROM node:24-alpine AS runtime
 
 ENV NODE_ENV=production
 
 WORKDIR /app
 
+# Suppression de npm et des outils de développement associés
+USER root
+RUN rm -rf /usr/local/lib/node_modules/npm \
+           /usr/local/lib/node_modules/corepack \
+           /opt/yarn-v* \
+    && rm -f /usr/local/bin/npm \
+             /usr/local/bin/npx \
+             /usr/local/bin/corepack \
+             /usr/local/bin/yarn \
+             /usr/local/bin/yarnpkg
+
+# Copie uniquement les dépendances de production
 COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 
+# Copie du code de l'API
 COPY --chown=node:node server.js db.js package.json ./
 
 USER node
