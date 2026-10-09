@@ -1,0 +1,8 @@
+services:
+  api:
+    image: ghcr.io/ynov-x-anthony/iafrate_thomas_demo-api/api:${IMAGE_TAG:-v1.5.0}
+    build: !reset null
+
+  notifier:
+    image: ghcr.io/ynov-x-anthony/iafrate_thomas_demo-api/notifier:${IMAGE_TAG:-v1.5.0}
+    build: !reset null

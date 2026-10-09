@@ -59,3 +59,65 @@ jobs:
           IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}/${{ matrix.service }}:${GITHUB_REF_NAME}"
           docker tag demo-${{ matrix.service }}:ci "$IMAGE"
           docker push "$IMAGE"
+  
+
+  deploy:
+    name: Deploiement automatique
+    needs: image
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Connexion a GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deployer la stack
+        env:
+          IMAGE_TAG: ${{ github.ref_name }}
+          POSTGRES_USER: demo
+          POSTGRES_PASSWORD: ${{ secrets.DEPLOY_POSTGRES_PASSWORD }}
+          POSTGRES_DB: demo
+        run: |
+          docker compose -f compose.yml -f compose.deploy.yml pull
+          docker compose -f compose.yml -f compose.deploy.yml up -d --no-build
+          docker compose -f compose.yml -f compose.deploy.yml ps
+
+      - name: Verifier l'API
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+
+      - name: Tester la notification
+        run: |
+          curl -fsS -X POST http://localhost:8080/products \
+            -H "Content-Type: application/json" \
+            -d '{"name":"Produit CI CD","price_cents":1500}'
+          sleep 2
+          docker compose -f compose.yml -f compose.deploy.yml logs notifier
+
+      - name: Arreter la stack
+        if: always()
+        env:
+          IMAGE_TAG: ${{ github.ref_name }}
+          POSTGRES_USER: demo
+          POSTGRES_PASSWORD: ${{ secrets.DEPLOY_POSTGRES_PASSWORD }}
+          POSTGRES_DB: demo
+        run: |
+          docker compose -f compose.yml -f compose.deploy.yml down
+
